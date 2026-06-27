@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Las Fijas — UNAMBAPrep</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    .fijas-hero {
+      background: linear-gradient(135deg, #1a0533, #2d1065, #1e62c0);
+      padding: 90px 1rem 2.5rem;
+      color: #fff;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .fijas-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 70% 50%, rgba(168,85,247,0.3), transparent 60%);
+      pointer-events: none;
+    }
+    .fijas-hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(1.75rem, 5vw, 2.75rem);
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+      position: relative;
+    }
+    .fijas-hero p {
+      opacity: 0.85;
+      font-size: 0.9375rem;
+      max-width: 480px;
+      margin: 0 auto 1.5rem;
+      position: relative;
+    }
+    .fija-badge-hero {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(168,85,247,0.25);
+      border: 1px solid rgba(168,85,247,0.4);
+      border-radius: 99px;
+      padding: 0.375rem 1rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      position: relative;
+    }
+
+    .fija-card {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .fija-card:hover {
+      box-shadow: var(--shadow-md);
+      border-color: #a855f7;
+      transform: translateY(-2px);
+    }
+    .fija-freq {
+      position: absolute;
+      top: 1rem; right: 1rem;
+      background: linear-gradient(135deg, #7c3aed, #a855f7);
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 99px;
+    }
+    .fija-tag {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #7c3aed;
+      margin-bottom: 0.5rem;
+    }
+    .fija-question {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.5;
+      margin-bottom: 0.75rem;
+      padding-right: 80px;
+    }
+    .fija-answer {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+    }
+    .fija-answer strong { color: var(--green-500); }
+    .fija-tip {
+      background: linear-gradient(135deg, rgba(124,58,237,0.07), rgba(168,85,247,0.04));
+      border-left: 3px solid #a855f7;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 0.625rem 0.875rem;
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+    .fija-tip strong { color: #7c3aed; }
+
+    [data-theme="dark"] .fija-tag { color: #c084fc; }
+    [data-theme="dark"] .fija-tip { border-color: #7c3aed; color: var(--text-secondary); }
+    [data-theme="dark"] .fija-tip strong { color: #c084fc; }
+
+    .lock-overlay {
+      position: relative;
+    }
+    .lock-overlay::after {
+      content: '🔒 Contenido Premium';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, transparent 30%, var(--bg-primary) 70%);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 2rem;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      border-radius: var(--radius-xl);
+    }
+    .blurred { filter: blur(4px); pointer-events: none; user-select: none; }
+
+    .premium-gate {
+      background: linear-gradient(135deg, #1a0533, #2d1065);
+      border-radius: var(--radius-xl);
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      color: #fff;
+      margin-top: 1.5rem;
+    }
+    .premium-gate h3 {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 0.625rem;
+    }
+    .premium-gate p {
+      font-size: 0.9375rem;
+      opacity: 0.85;
+      max-width: 400px;
+      margin: 0 auto 1.5rem;
+    }
+
+    .fijas-tabs {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+    .fijas-tab {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: 99px;
+      padding: 0.375rem 0.875rem;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text-secondary);
+      font-family: var(--font-body);
+      transition: all 0.2s;
+    }
+    .fijas-tab.active, .fijas-tab:hover {
+      background: #7c3aed;
+      border-color: #7c3aed;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar" id="navbar">
+  <div class="container nav-inner">
+    <a href="../index.html" class="logo">
+      <span class="logo-icon">🎓</span>
+      <span class="logo-text">UNAMBA<span class="logo-accent">Prep</span></span>
+    </a>
+    <div class="nav-links" id="navLinks">
+      <a href="../index.html">Inicio</a>
+      <a href="simulacro.html">Simulacro</a>
+      <a href="solucionario.html">Solucionario</a>
+      <a href="fijas.html" style="color:#a855f7; font-weight:700">Las Fijas ⭐</a>
+      <a href="registro.html" class="btn btn-nav">Premium</a>
+    </div>
+    <div class="nav-controls">
+      <button class="theme-toggle" id="themeToggle"><span class="sun">☀️</span><span class="moon">🌙</span></button>
+      <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="fijas-hero">
+  <div class="fija-badge-hero">⭐ Sección Premium · Vista previa gratuita</div>
+  <h1>✨ Las Fijas UNAMBA</h1>
+  <p>Las preguntas que más se repiten en los exámenes de admisión. Apréndetelas y gana puntos seguros.</p>
+</div>
+
+<div class="section">
+  <div class="container" style="max-width:760px">
+
+    <div class="fijas-tabs" id="fijasTabsBar">
+      <button class="fijas-tab active" data-cat="all">📚 Todas</button>
+      <button class="fijas-tab" data-cat="mat">🔢 Matemática</button>
+      <button class="fijas-tab" data-cat="fis">⚡ Física</button>
+      <button class="fijas-tab" data-cat="qui">🧪 Química</button>
+      <button class="fijas-tab" data-cat="bio">🧬 Biología</button>
+      <button class="fijas-tab" data-cat="ver">💬 Verbal</button>
+    </div>
+
+    <!-- FREE PREVIEW (first 5 visible) -->
+    <div id="fijasListFree"></div>
+
+    <!-- BLURRED PREMIUM GATE -->
+    <div class="lock-overlay">
+      <div id="fijasListBlurred" class="blurred"></div>
+    </div>
+
+    <!-- PREMIUM CTA -->
+    <div class="premium-gate">
+      <div style="font-size:2.5rem; margin-bottom:0.75rem">🔒</div>
+      <h3>Desbloquea todas las Fijas</h3>
+      <p>
+        Accede a las <strong>80+ preguntas</strong> con mayor frecuencia de aparición en los exámenes UNAMBA 2016–2024.
+        Incluye consejos de memorización y trucos de resolución rápida.
+      </p>
+      <a href="registro.html?premium=1" class="btn btn-white btn-lg">
+        ⭐ Activar Premium — S/ 29/mes
+      </a>
+      <p style="font-size:0.75rem; opacity:0.7; margin-top:0.875rem">
+        Garantía de 7 días · Yape · Plin · BCP · Tarjeta
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="footer-bottom">
+    <div class="container">
+      <p>© 2025 UNAMBAPrep · <a href="../index.html" style="color:var(--accent)">Volver al inicio</a></p>
+    </div>
+  </div>
+</footer>
+
+<script src="../js/app.js"></script>
+<script>
+const FIJAS = [
+  // ── MATEMÁTICA ──
+  {
+    cat: "mat",
+    subject: "Aritmética / Álgebra",
+    freq: "Aparece en el 78% de exámenes",
+    question: "¿Cuál es el MCM de 12 y 18?",
+    answer: "36",
+    tip: "<strong>Truco:</strong> Descompón en factores primos. MCM(12,18): 12=2²×3, 18=2×3². MCM = 2²×3² = 36. Este tipo de ejercicio siempre aparece en la primera parte del examen."
+  },
+  {
+    cat: "mat",
+    subject: "Álgebra",
+    freq: "Aparece en el 71% de exámenes",
+    question: "Si f(x) = x² + 2x − 3, ¿para qué valor de x, f(x) = 0?",
+    answer: "x = 1 o x = −3",
+    tip: "<strong>Método:</strong> Factoriza → (x+3)(x−1) = 0. Las raíces son x = −3 y x = 1. En el examen siempre piden raíces de cuadráticas."
+  },
+  {
+    cat: "mat",
+    subject: "Razonamiento Matemático",
+    freq: "Aparece en el 68% de exámenes",
+    question: "¿Cuántos términos tiene la progresión: 5, 8, 11, ..., 98?",
+    answer: "32 términos",
+    tip: "<strong>Fórmula:</strong> n = (último − primero)/razón + 1 = (98 − 5)/3 + 1 = 31 + 1 = 32. Memoriza esta fórmula, es la más repetida de progresiones."
+  },
+  {
+    cat: "mat",
+    subject: "Aritmética",
+    freq: "Aparece en el 65% de exámenes",
+    question: "Un comerciante vende un artículo a S/ 120 obteniendo una ganancia del 20%. ¿Cuál fue el costo?",
+    answer: "S/ 100",
+    tip: "<strong>Regla:</strong> Precio venta = Costo × (1 + ganancia%). 120 = Costo × 1.20 → Costo = 100. Los problemas de porcentaje de ganancia son fijos en el examen."
+  },
+  {
+    cat: "mat",
+    subject: "Geometría",
+    freq: "Aparece en el 62% de exámenes",
+    question: "¿Cuál es el área de un trapecio con bases 8 y 12 cm, y altura 5 cm?",
+    answer: "50 cm²",
+    tip: "<strong>Fórmula del trapecio:</strong> A = (B + b) × h / 2 = (12 + 8) × 5 / 2 = 20 × 5/2 = 50 cm². Esta fórmula siempre entra."
+  },
+
+  // ── FÍSICA ──
+  {
+    cat: "fis",
+    subject: "Mecánica",
+    freq: "Aparece en el 82% de exámenes",
+    question: "Un cuerpo de 10 kg se mueve con aceleración de 3 m/s². ¿Cuál es la fuerza neta?",
+    answer: "30 N",
+    tip: "<strong>2da Ley de Newton:</strong> F = m × a = 10 × 3 = 30 N. Es el ejercicio más frecuente de física. SIEMPRE entra."
+  },
+  {
+    cat: "fis",
+    subject: "Cinemática",
+    freq: "Aparece en el 74% de exámenes",
+    question: "Un auto va a 72 km/h. ¿Cuánto es en m/s?",
+    answer: "20 m/s",
+    tip: "<strong>Conversión clave:</strong> 1 km/h = 1/3.6 m/s. 72 ÷ 3.6 = 20 m/s. O también: 72 × (1000/3600) = 20 m/s. Este tipo de conversión es muy frecuente."
+  },
+  {
+    cat: "fis",
+    subject: "Trabajo y Energía",
+    freq: "Aparece en el 61% de exámenes",
+    question: "¿Cuál es la energía cinética de un cuerpo de 4 kg a 10 m/s?",
+    answer: "200 J",
+    tip: "<strong>Fórmula:</strong> Ec = ½ × m × v² = ½ × 4 × 100 = 200 J. Siempre sustituye con cuidado: v² = 10² = 100."
+  },
+
+  // ── QUÍMICA ──
+  {
+    cat: "qui",
+    subject: "Tabla Periódica",
+    freq: "Aparece en el 79% de exámenes",
+    question: "¿Cuántos electrones tiene el ion Na⁺?",
+    answer: "10 electrones",
+    tip: "<strong>Clave:</strong> Na tiene Z=11 (11 electrones). Al perder 1 electrón → Na⁺ tiene 10 electrones. Los iones son una pregunta casi obligatoria."
+  },
+  {
+    cat: "qui",
+    subject: "Estequiometría",
+    freq: "Aparece en el 72% de exámenes",
+    question: "¿Cuántos gramos hay en 2 moles de NaCl? (Na=23, Cl=35.5)",
+    answer: "117 g",
+    tip: "<strong>Método:</strong> M(NaCl) = 23 + 35.5 = 58.5 g/mol. 2 mol × 58.5 g/mol = 117 g. La estequiometría es la parte más pesada de química en el examen UNAMBA."
+  },
+  {
+    cat: "qui",
+    subject: "Enlace Químico",
+    freq: "Aparece en el 67% de exámenes",
+    question: "¿Qué tipo de enlace tiene el NaCl?",
+    answer: "Enlace iónico",
+    tip: "<strong>Regla:</strong> Metal + No-metal = enlace iónico. No-metal + No-metal = enlace covalente. Esta clasificación es pregunta segura."
+  },
+
+  // ── BIOLOGÍA ──
+  {
+    cat: "bio",
+    subject: "Célula",
+    freq: "Aparece en el 81% de exámenes",
+    question: "¿Cuál es la central energética de la célula?",
+    answer: "Mitocondria",
+    tip: "<strong>Mnemotecnia:</strong> 'MITO = MI Turbina Organela' → Mitocondria = fábrica de ATP. Es la pregunta más repetida de biología celular. También saben preguntar: ¿dónde se sintetizan proteínas? → Ribosoma."
+  },
+  {
+    cat: "bio",
+    subject: "Genética",
+    freq: "Aparece en el 69% de exámenes",
+    question: "¿Cuántos cromosomas tiene una célula humana haploide (gameto)?",
+    answer: "23 cromosomas",
+    tip: "<strong>Diferencia clave:</strong> Célula somática (diploide) = 46 cromosomas (23 pares). Gameto (haploide) = 23 cromosomas. Se produce por meiosis. Esta distinción aparece casi siempre."
+  },
+
+  // ── VERBAL ──
+  {
+    cat: "ver",
+    subject: "Razonamiento Verbal",
+    freq: "Aparece en el 77% de exámenes",
+    question: "¿Cuál es el sinónimo de EFÍMERO?",
+    answer: "Pasajero / Fugaz / Transitorio",
+    tip: "<strong>EFÍMERO</strong> = que dura muy poco tiempo. Sinónimos: pasajero, fugaz, transitorio, breve, momentáneo. Su antónimo es: eterno, perdurable, permanente. Las preguntas de sinónimos de palabras cultas son muy frecuentes."
+  },
+  {
+    cat: "ver",
+    subject: "Razonamiento Verbal",
+    freq: "Aparece en el 71% de exámenes",
+    question: "LIBRO : BIBLIOTECA :: CUADRO : ___",
+    answer: "Museo / Galería",
+    tip: "<strong>Relación:</strong> objeto → lugar donde se conserva/exhibe. LIBRO se guarda en BIBLIOTECA. CUADRO (pintura) se guarda en MUSEO o GALERÍA. Las analogías de contenido-contenedor son las más frecuentes."
+  },
+  {
+    cat: "ver",
+    subject: "Comprensión Lectora",
+    freq: "Aparece en el 65% de exámenes",
+    question: "En una lectura donde el autor da argumentos a favor y en contra de un tema, ¿cuál es la intención del texto?",
+    answer: "Exponer / Argumentar de forma objetiva (texto expositivo-argumentativo)",
+    tip: "<strong>Tipos de texto:</strong> Narrativo = cuenta historia. Descriptivo = describe. Argumentativo = defiende postura. Expositivo = informa objetivamente. Identificar el tipo de texto y la intención del autor es pregunta fija."
+  }
+];
+
+let currentCat = 'all';
+const FREE_LIMIT = 5;
+
+function renderFijas(cat) {
+  const filtered = cat === 'all' ? FIJAS : FIJAS.filter(f => f.cat === cat);
+  const free = filtered.slice(0, FREE_LIMIT);
+  const locked = filtered.slice(FREE_LIMIT);
+
+  document.getElementById('fijasListFree').innerHTML = free.map(renderFijaCard).join('');
+  document.getElementById('fijasListBlurred').innerHTML = locked.length
+    ? locked.map(renderFijaCard).join('')
+    : '';
+}
+
+function renderFijaCard(f) {
+  return `
+    <div class="fija-card">
+      <div class="fija-freq">${f.freq}</div>
+      <div class="fija-tag">${f.subject}</div>
+      <p class="fija-question">${f.question}</p>
+      <p class="fija-answer">Respuesta: <strong>${f.answer}</strong></p>
+      <div class="fija-tip">💡 ${f.tip}</div>
+    </div>`;
+}
+
+// Tabs
+document.getElementById('fijasTabsBar').querySelectorAll('.fijas-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.fijas-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentCat = btn.dataset.cat;
+    renderFijas(currentCat);
+  });
+});
+
+renderFijas('all');
+</script>
+</body>
+</html>

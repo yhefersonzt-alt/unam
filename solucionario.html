@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Solucionario UNAMBA — UNAMBAPrep</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+<nav class="navbar" id="navbar">
+  <div class="container nav-inner">
+    <a href="../index.html" class="logo">
+      <span class="logo-icon">🎓</span>
+      <span class="logo-text">UNAMBA<span class="logo-accent">Prep</span></span>
+    </a>
+    <div class="nav-links" id="navLinks">
+      <a href="../index.html">Inicio</a>
+      <a href="simulacro.html">Simulacro</a>
+      <a href="solucionario.html" style="color: var(--accent); font-weight:700">Solucionario</a>
+      <a href="registro.html" class="btn btn-nav">Premium</a>
+    </div>
+    <div class="nav-controls">
+      <button class="theme-toggle" id="themeToggle"><span class="sun">☀️</span><span class="moon">🌙</span></button>
+      <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <h1>📖 Solucionario Paso a Paso</h1>
+  <p>Revisa cada problema con su solución detallada. Filtra por materia y año de examen.</p>
+</div>
+
+<div class="section">
+  <div class="container">
+
+    <!-- Filters -->
+    <div class="filters-bar" id="filtersBar">
+      <button class="filter-btn active" data-filter="all">📚 Todas</button>
+      <button class="filter-btn" data-filter="Razonamiento Matemático">🔢 Matemática</button>
+      <button class="filter-btn" data-filter="Razonamiento Verbal">💬 Verbal</button>
+      <button class="filter-btn" data-filter="Física">⚡ Física</button>
+      <button class="filter-btn" data-filter="Química">🧪 Química</button>
+      <button class="filter-btn" data-filter="Biología">🧬 Biología</button>
+      <button class="filter-btn" data-filter="Historia del Perú">📜 Historia</button>
+      <button class="filter-btn" data-filter="Geografía">🌎 Geografía</button>
+    </div>
+
+    <!-- Search -->
+    <div style="margin-bottom: 1.5rem;">
+      <input
+        type="text"
+        id="searchInput"
+        class="form-input"
+        placeholder="🔍 Buscar pregunta por palabra clave..."
+        style="max-width: 480px;"
+      />
+    </div>
+
+    <!-- Stats bar -->
+    <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:1.5rem; align-items:center;">
+      <span style="font-size:0.875rem; color:var(--text-muted);" id="questionCount">Mostrando todas las preguntas</span>
+      <button class="btn btn-ghost" id="expandAllBtn" style="padding:0.375rem 0.75rem; font-size:0.8rem;">
+        Expandir todas
+      </button>
+      <button class="btn btn-ghost" id="collapseAllBtn" style="padding:0.375rem 0.75rem; font-size:0.8rem;">
+        Colapsar todas
+      </button>
+    </div>
+
+    <!-- Question List -->
+    <div id="solutionList"></div>
+
+    <!-- Premium teaser -->
+    <div style="text-align:center; padding: 2rem; background: linear-gradient(135deg, var(--blue-800), var(--blue-600)); border-radius: var(--radius-xl); margin-top: 2rem; color: #fff;">
+      <div style="font-size:2rem; margin-bottom:0.75rem">🔒</div>
+      <h3 style="font-family: var(--font-display); font-size:1.375rem; font-weight:800; margin-bottom:0.5rem">
+        +1,150 preguntas más en Premium
+      </h3>
+      <p style="font-size:0.9375rem; opacity:0.85; margin-bottom:1.25rem; max-width:400px; margin-left:auto; margin-right:auto">
+        Accede al banco completo de exámenes UNAMBA 2016–2024, incluyendo "Las Fijas": las preguntas que más se repiten.
+      </p>
+      <a href="registro.html" class="btn btn-white">Activar Premium — S/ 29/mes</a>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="footer-bottom">
+    <div class="container">
+      <p>© 2025 UNAMBAPrep · <a href="../index.html" style="color:var(--accent)">Volver al inicio</a></p>
+    </div>
+  </div>
+</footer>
+
+<script src="../js/app.js"></script>
+<script src="../js/questions.js"></script>
+<script>
+// ── BUILD SOLUTION CARDS ──
+let currentFilter = 'all';
+let allQuestions = [];
+
+function getAllQuestions() {
+  const bank = window.QUESTION_BANK;
+  let all = [];
+  Object.values(bank).forEach(arr => all.push(...arr));
+  return all;
+}
+
+function renderSolutions(questions) {
+  const list = document.getElementById('solutionList');
+  const letters = ['A', 'B', 'C', 'D', 'E'];
+  document.getElementById('questionCount').textContent =
+    `Mostrando ${questions.length} pregunta${questions.length !== 1 ? 's' : ''}`;
+
+  if (questions.length === 0) {
+    list.innerHTML = `
+      <div style="text-align:center; padding: 3rem; color:var(--text-muted);">
+        <div style="font-size:3rem; margin-bottom:1rem;">🔍</div>
+        <p>No se encontraron preguntas con ese filtro.</p>
+      </div>`;
+    return;
+  }
+
+  list.innerHTML = questions.map((q, idx) => `
+    <div class="sol-card" data-subject="${q.subject}" data-id="${q.id}">
+      <div class="sol-header" onclick="toggleSolution('${q.id}')">
+        <div class="sol-header-left">
+          <span class="sol-tag">${q.subject} · ${q.year || 'CPU'}</span>
+          <p class="sol-question">${q.question}</p>
+          <p class="sol-answer">Respuesta: <strong>${letters[q.correct]}) ${q.options[q.correct].replace(/^[A-E]\)\s*/, '')}</strong></p>
+        </div>
+        <button class="sol-toggle-btn" id="btn-${q.id}">Ver solución ▼</button>
+      </div>
+      <div class="sol-solution" id="sol-${q.id}">
+        <h4>💡 Solución paso a paso</h4>
+        ${q.solution.steps.map(step => `
+          <div class="step-item">
+            <div class="step-num">${step.n}</div>
+            <div class="step-content">${step.text}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleSolution(id) {
+  const sol = document.getElementById(`sol-${id}`);
+  const btn = document.getElementById(`btn-${id}`);
+  const isOpen = sol.classList.toggle('visible');
+  btn.textContent = isOpen ? 'Ocultar ▲' : 'Ver solución ▼';
+  if (isOpen) sol.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function applyFilters() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  let qs = allQuestions;
+  if (currentFilter !== 'all') qs = qs.filter(q => q.subject === currentFilter);
+  if (search) qs = qs.filter(q => q.question.toLowerCase().includes(search) || q.subject.toLowerCase().includes(search));
+  renderSolutions(qs);
+}
+
+// Init
+allQuestions = getAllQuestions();
+renderSolutions(allQuestions);
+
+// Filter buttons
+document.getElementById('filtersBar').querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    applyFilters();
+  });
+});
+
+// Search
+document.getElementById('searchInput')?.addEventListener('input', applyFilters);
+
+// Expand/collapse all
+document.getElementById('expandAllBtn')?.addEventListener('click', () => {
+  document.querySelectorAll('.sol-solution').forEach(el => el.classList.add('visible'));
+  document.querySelectorAll('.sol-toggle-btn').forEach(btn => btn.textContent = 'Ocultar ▲');
+});
+document.getElementById('collapseAllBtn')?.addEventListener('click', () => {
+  document.querySelectorAll('.sol-solution').forEach(el => el.classList.remove('visible'));
+  document.querySelectorAll('.sol-toggle-btn').forEach(btn => btn.textContent = 'Ver solución ▼');
+});
+</script>
+</body>
+</html>

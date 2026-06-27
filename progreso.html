@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mi Progreso — UNAMBAPrep</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Dashboard-specific styles ── */
+    .dash-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      padding: 1.5rem 0 3rem;
+    }
+    @media (min-width: 640px) {
+      .dash-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (min-width: 1024px) {
+      .dash-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    .dash-card {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 1.25rem 1.5rem;
+      transition: box-shadow 0.2s;
+    }
+    .dash-card:hover { box-shadow: var(--shadow-md); }
+
+    .dash-card-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+    .dash-card-value {
+      font-family: var(--font-display);
+      font-size: 2.25rem;
+      font-weight: 800;
+      color: var(--accent);
+      line-height: 1;
+    }
+    .dash-card-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Donut ring chart */
+    .ring-chart {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .ring-svg { transform: rotate(-90deg); }
+    .ring-bg { fill: none; stroke: var(--border); stroke-width: 10; }
+    .ring-fill {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 10;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .ring-center {
+      text-align: center;
+      margin-top: -0.5rem;
+    }
+    .ring-pct {
+      font-family: var(--font-display);
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--accent);
+    }
+    .ring-label { font-size: 0.72rem; color: var(--text-muted); }
+
+    /* Bar chart */
+    .bar-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    .bar-label {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      width: 120px;
+      flex-shrink: 0;
+    }
+    .bar-track {
+      flex: 1;
+      height: 10px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, var(--blue-500), var(--sky-400));
+      transition: width 1s ease;
+    }
+    .bar-pct {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      width: 36px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    /* Session history */
+    .session-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.875rem;
+    }
+    .session-row:last-child { border-bottom: none; }
+    .session-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .session-date { color: var(--text-muted); width: 90px; flex-shrink: 0; }
+    .session-score { font-weight: 700; color: var(--text-primary); flex: 1; }
+    .session-badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 99px;
+    }
+
+    /* Badge grid */
+    .badge-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 0.75rem;
+    }
+    .badge-item {
+      background: var(--bg-secondary);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1rem;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .badge-item.earned {
+      border-color: var(--gold-400);
+      background: linear-gradient(135deg, rgba(251, 191, 36, 0.08), rgba(245, 158, 11, 0.05));
+    }
+    .badge-emoji { font-size: 1.75rem; display: block; margin-bottom: 0.375rem; }
+    .badge-name {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      line-height: 1.3;
+    }
+    .badge-date {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+    .badge-item:not(.earned) { opacity: 0.45; filter: grayscale(1); }
+
+    /* Mini spark bar for sessions history */
+    .spark-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+      height: 40px;
+    }
+    .spark-bar {
+      flex: 1;
+      border-radius: 3px 3px 0 0;
+      min-height: 4px;
+      transition: height 0.8s ease;
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-muted);
+    }
+    .empty-state .es-emoji { font-size: 3rem; margin-bottom: 0.75rem; }
+    .empty-state p { font-size: 0.9rem; margin-bottom: 1.25rem; }
+
+    /* Top panel */
+    .dash-hero {
+      background: linear-gradient(135deg, var(--blue-800), var(--blue-600), var(--sky-500));
+      padding: 80px 1rem 2rem;
+      color: #fff;
+    }
+    .dash-hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 4vw, 2rem);
+      font-weight: 800;
+      margin-bottom: 0.25rem;
+    }
+    .dash-hero p { opacity: 0.85; font-size: 0.9375rem; }
+
+    .wide-card {
+      grid-column: 1 / -1;
+    }
+    @media (min-width: 640px) {
+      .wide-2 { grid-column: span 2; }
+    }
+    @media (min-width: 1024px) {
+      .wide-2 { grid-column: span 2; }
+      .wide-4 { grid-column: span 4; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+  <div class="container nav-inner">
+    <a href="../index.html" class="logo">
+      <span class="logo-icon">🎓</span>
+      <span class="logo-text">UNAMBA<span class="logo-accent">Prep</span></span>
+    </a>
+    <div class="nav-links" id="navLinks">
+      <a href="../index.html">Inicio</a>
+      <a href="simulacro.html">Simulacro</a>
+      <a href="solucionario.html">Solucionario</a>
+      <a href="progreso.html" style="color: var(--accent); font-weight:700">Mi Progreso</a>
+      <a href="registro.html" class="btn btn-nav">Premium</a>
+    </div>
+    <div class="nav-controls">
+      <button class="theme-toggle" id="themeToggle"><span class="sun">☀️</span><span class="moon">🌙</span></button>
+      <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="dash-hero">
+  <div class="container">
+    <h1 id="dashGreeting">📊 Mi Progreso</h1>
+    <p>Tu historial de simulacros y rendimiento por materia</p>
+  </div>
+</div>
+
+<!-- MAIN DASHBOARD -->
+<div class="container">
+  <div class="dash-grid" id="dashContent">
+    <!-- Rendered by JS -->
+  </div>
+</div>
+
+<!-- RESET CONFIRM MODAL -->
+<div id="resetModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:200; display:flex; align-items:center; justify-content:center; padding:1rem;" class="hidden">
+  <div style="background: var(--bg-card); border-radius: var(--radius-xl); padding: 2rem; max-width:360px; width:100%; text-align:center; box-shadow: var(--shadow-lg);">
+    <div style="font-size:2.5rem; margin-bottom:0.75rem">⚠️</div>
+    <h3 style="font-family: var(--font-display); margin-bottom:0.5rem">¿Borrar todo el progreso?</h3>
+    <p style="font-size:0.875rem; color:var(--text-muted); margin-bottom:1.5rem">Esta acción no se puede deshacer. Se eliminarán tus estadísticas, historial y logros.</p>
+    <div style="display:flex; gap:0.75rem;">
+      <button onclick="closeModal()" class="btn btn-ghost" style="flex:1">Cancelar</button>
+      <button onclick="confirmReset()" class="btn btn-primary" style="flex:1; background:var(--red-500); border-color:var(--red-500)">Sí, borrar</button>
+    </div>
+  </div>
+</div>
+
+<script src="../js/app.js"></script>
+<script src="../js/progress.js"></script>
+<script>
+// ── ALL POSSIBLE BADGES ──
+const ALL_BADGES = [
+  { id: 'first',     label: 'Primer simulacro',          emoji: '🎯' },
+  { id: '5games',    label: '5 simulacros completados',  emoji: '⭐' },
+  { id: '10games',   label: '10 simulacros completados', emoji: '🔥' },
+  { id: '50correct', label: '50 respuestas correctas',   emoji: '💪' },
+  { id: '100correct',label: '100 respuestas correctas',  emoji: '🏆' },
+  { id: 'streak3',   label: 'Racha de 3 días',           emoji: '📅' },
+  { id: 'streak7',   label: 'Racha de 7 días',           emoji: '🌟' },
+  { id: 'ace',       label: '¡Excelente! +80% en un simulacro', emoji: '🥇' },
+];
+
+// ── RENDER DASHBOARD ──
+function renderDashboard() {
+  const data = Progress.load();
+  const container = document.getElementById('dashContent');
+  const globalPct = Progress.getGlobalPct(data);
+  const hasData = data.totalSessions > 0;
+
+  // Greeting
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Buenos días' : hour < 19 ? 'Buenas tardes' : 'Buenas noches';
+  document.getElementById('dashGreeting').textContent = `${greeting}, estudiante 👋`;
+
+  if (!hasData) {
+    renderEmptyState(container);
+    return;
+  }
+
+  container.innerHTML = `
+    <!-- KPI Cards -->
+    <div class="dash-card">
+      <div class="dash-card-label">🎯 Simulacros</div>
+      <div class="dash-card-value">${data.totalSessions}</div>
+      <div class="dash-card-sub">sesiones completadas</div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-card-label">✅ Respuestas correctas</div>
+      <div class="dash-card-value">${data.totalCorrect}</div>
+      <div class="dash-card-sub">de ${data.totalQuestions} preguntas respondidas</div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-card-label">🔥 Racha actual</div>
+      <div class="dash-card-value">${data.streak}</div>
+      <div class="dash-card-sub">día${data.streak !== 1 ? 's' : ''} consecutivo${data.streak !== 1 ? 's' : ''}</div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-card-label">📅 Última sesión</div>
+      <div class="dash-card-value" style="font-size:1.25rem; line-height:1.3">${data.lastSession || '—'}</div>
+      <div class="dash-card-sub">${data.sessions[0] ? data.sessions[0].area || 'simulacro mixto' : ''}</div>
+    </div>
+
+    <!-- Ring + Subject bars -->
+    <div class="dash-card wide-2" style="display:flex; flex-direction:column; gap:1rem;">
+      <div class="section-title">📈 Rendimiento global</div>
+      <div style="display:flex; align-items:center; gap:2rem; flex-wrap:wrap;">
+        <div class="ring-chart">
+          <svg class="ring-svg" width="120" height="120" viewBox="0 0 120 120">
+            <circle class="ring-bg" cx="60" cy="60" r="50"/>
+            <circle class="ring-fill" cx="60" cy="60" r="50"
+              stroke-dasharray="${2 * Math.PI * 50}"
+              stroke-dashoffset="${2 * Math.PI * 50 * (1 - globalPct / 100)}"
+              id="ringCircle"/>
+          </svg>
+          <div class="ring-center" style="margin-top:-135px; position:relative; z-index:1; pointer-events:none">
+            <div class="ring-pct">${globalPct}%</div>
+            <div class="ring-label">aciertos</div>
+          </div>
+          <div style="height:120px"></div>
+        </div>
+        <div style="flex:1; min-width:200px;">
+          ${renderPctMessage(globalPct)}
+          <div style="margin-top:1rem; display:flex; flex-direction:column; gap:0.5rem;">
+            <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:var(--text-muted)">
+              <span>Correctas <strong style="color:var(--green-500)">${data.totalCorrect}</strong></span>
+              <span>Incorrectas <strong style="color:var(--red-500)">${data.totalQuestions - data.totalCorrect}</strong></span>
+            </div>
+            <div style="height:10px; background:var(--border); border-radius:99px; overflow:hidden;">
+              <div style="height:100%; width:${globalPct}%; background: linear-gradient(90deg, var(--green-500), var(--sky-400)); border-radius:99px; transition: width 1s ease;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sparkline history -->
+    <div class="dash-card wide-2">
+      <div class="section-title">⚡ Últimas sesiones</div>
+      ${renderSparkline(data.sessions)}
+    </div>
+
+    <!-- Subject breakdown -->
+    <div class="dash-card wide-2">
+      <div class="section-title">📚 Rendimiento por materia</div>
+      ${renderSubjectBars(data.subjectStats)}
+    </div>
+
+    <!-- Session history -->
+    <div class="dash-card wide-2">
+      <div class="section-title">🗓 Historial de simulacros</div>
+      ${renderSessionHistory(data.sessions)}
+    </div>
+
+    <!-- Badges -->
+    <div class="dash-card wide-4">
+      <div class="section-title">🏅 Logros</div>
+      <div class="badge-grid">
+        ${renderBadges(data.badges || [])}
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="dash-card wide-4" style="text-align:center; padding:1.5rem;">
+      <div style="display:flex; gap:0.75rem; flex-wrap:wrap; justify-content:center;">
+        <a href="simulacro.html" class="btn btn-primary">🚀 Nuevo simulacro</a>
+        <a href="solucionario.html" class="btn btn-outline">📖 Solucionario</a>
+        <button class="btn btn-ghost" onclick="openModal()" style="color:var(--red-500); border-color:var(--red-500)">🗑 Borrar progreso</button>
+      </div>
+    </div>
+  `;
+
+  // Animate ring after DOM update
+  setTimeout(() => {
+    const circle = document.getElementById('ringCircle');
+    if (circle) {
+      const circumference = 2 * Math.PI * 50;
+      circle.style.strokeDashoffset = circumference * (1 - globalPct / 100);
+    }
+  }, 100);
+}
+
+function renderEmptyState(container) {
+  container.innerHTML = `
+    <div class="dash-card wide-4" style="grid-column: 1 / -1">
+      <div class="empty-state">
+        <div class="es-emoji">📊</div>
+        <h3 style="font-family: var(--font-display); font-size:1.25rem; margin-bottom:0.5rem; color:var(--text-primary)">
+          Aún no tienes estadísticas
+        </h3>
+        <p>Completa tu primer simulacro para que tu progreso empiece a aparecer aquí.</p>
+        <a href="simulacro.html" class="btn btn-primary btn-lg">🚀 Empezar primer simulacro</a>
+      </div>
+    </div>`;
+}
+
+function renderPctMessage(pct) {
+  let msg, color;
+  if (pct >= 80) { msg = '🏆 ¡Excelente nivel!';   color = 'var(--green-500)'; }
+  else if (pct >= 60) { msg = '🎯 Buen progreso';     color = 'var(--accent)'; }
+  else if (pct >= 40) { msg = '📖 Sigue practicando'; color = 'var(--gold-500)'; }
+  else               { msg = '💪 Refuerza las bases'; color = 'var(--red-500)'; }
+  return `<div style="font-size:1rem; font-weight:700; color:${color}">${msg}</div>
+          <div style="font-size:0.8rem; color:var(--text-muted); margin-top:0.25rem">
+            Promedio general sobre todos tus simulacros
+          </div>`;
+}
+
+function renderSubjectBars(subjectStats) {
+  const entries = Object.entries(subjectStats);
+  if (!entries.length) return '<p style="font-size:0.875rem; color:var(--text-muted)">Sin datos aún.</p>';
+
+  return entries.map(([subj, stats]) => {
+    const pct = stats.total > 0 ? Math.round(stats.correct / stats.total * 100) : 0;
+    const color = pct >= 70 ? 'var(--green-500)' : pct >= 40 ? 'var(--gold-400)' : 'var(--red-500)';
+    return `
+      <div class="bar-row">
+        <div class="bar-label">${subj.replace('Razonamiento ', '')}</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:${pct}%; background:${color}"></div>
+        </div>
+        <div class="bar-pct" style="color:${color}">${pct}%</div>
+      </div>`;
+  }).join('');
+}
+
+function renderSessionHistory(sessions) {
+  if (!sessions.length) return '<p style="font-size:0.875rem; color:var(--text-muted)">Sin historial todavía.</p>';
+  return sessions.map(s => {
+    const color = s.pct >= 70 ? '#22c55e' : s.pct >= 40 ? '#f59e0b' : '#ef4444';
+    const label = s.pct >= 70 ? 'Aprobado' : s.pct >= 40 ? 'Regular' : 'A mejorar';
+    return `
+      <div class="session-row">
+        <div class="session-dot" style="background:${color}"></div>
+        <div class="session-date">${s.date}</div>
+        <div class="session-score">${s.correct}/${s.total} — ${s.pct}%</div>
+        <div class="session-badge" style="background:${color}22; color:${color}">${label}</div>
+      </div>`;
+  }).join('');
+}
+
+function renderSparkline(sessions) {
+  if (!sessions.length) return '<p style="font-size:0.8rem; color:var(--text-muted)">Sin datos aún</p>';
+  const reversed = [...sessions].reverse().slice(-8);
+  const max = Math.max(...reversed.map(s => s.pct), 1);
+  return `
+    <div class="spark-bars">
+      ${reversed.map(s => {
+        const h = Math.round((s.pct / max) * 36) + 4;
+        const color = s.pct >= 70 ? '#22c55e' : s.pct >= 40 ? '#f59e0b' : '#ef4444';
+        return `<div class="spark-bar" style="height:${h}px; background:${color}; opacity:0.8;" title="${s.date}: ${s.pct}%"></div>`;
+      }).join('')}
+    </div>
+    <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--text-muted); margin-top:0.5rem;">
+      <span>Más antiguo</span><span>Más reciente</span>
+    </div>
+    <div style="display:flex; gap:1rem; margin-top:0.75rem; flex-wrap:wrap;">
+      <span style="font-size:0.75rem; display:flex; align-items:center; gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#22c55e;display:inline-block"></span>≥70%</span>
+      <span style="font-size:0.75rem; display:flex; align-items:center; gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#f59e0b;display:inline-block"></span>40–69%</span>
+      <span style="font-size:0.75rem; display:flex; align-items:center; gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#ef4444;display:inline-block"></span><40%</span>
+    </div>`;
+}
+
+function renderBadges(earned) {
+  const earnedIds = earned.map(b => b.id);
+  return ALL_BADGES.map(badge => {
+    const isEarned = earnedIds.includes(badge.id);
+    const earnedData = earned.find(b => b.id === badge.id);
+    return `
+      <div class="badge-item ${isEarned ? 'earned' : ''}">
+        <span class="badge-emoji">${badge.emoji}</span>
+        <div class="badge-name">${badge.label}</div>
+        ${isEarned && earnedData ? `<div class="badge-date">${earnedData.date}</div>` : '<div class="badge-date">🔒 Bloqueado</div>'}
+      </div>`;
+  }).join('');
+}
+
+// Modal helpers
+function openModal() {
+  document.getElementById('resetModal').classList.remove('hidden');
+  document.getElementById('resetModal').style.display = 'flex';
+}
+function closeModal() {
+  document.getElementById('resetModal').classList.add('hidden');
+  document.getElementById('resetModal').style.display = 'none';
+}
+function confirmReset() {
+  Progress.reset();
+  closeModal();
+  renderDashboard();
+}
+
+// ── INIT ──
+renderDashboard();
+</script>
+</body>
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulacro UNAMBA — UNAMBAPrep</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+<!-- ═══ NAVBAR ═══ -->
+<nav class="navbar" id="navbar">
+  <div class="container nav-inner">
+    <a href="../index.html" class="logo">
+      <span class="logo-icon">🎓</span>
+      <span class="logo-text">UNAMBA<span class="logo-accent">Prep</span></span>
+    </a>
+    <div class="nav-links" id="navLinks">
+      <a href="../index.html">Inicio</a>
+      <a href="simulacro.html" style="color: var(--accent); font-weight:700">Simulacro</a>
+      <a href="solucionario.html">Solucionario</a>
+      <a href="registro.html" class="btn btn-nav">Premium</a>
+    </div>
+    <div class="nav-controls">
+      <button class="theme-toggle" id="themeToggle" aria-label="Cambiar tema">
+        <span class="sun">☀️</span><span class="moon">🌙</span>
+      </button>
+      <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══ AREA SELECTOR ═══ -->
+<div id="selectorScreen">
+  <div class="page-hero">
+    <h1>🎯 Simulacro UNAMBA</h1>
+    <p>Elige tu área de carrera y empieza a practicar. Las mismas condiciones del examen real.</p>
+  </div>
+
+  <div class="area-selector">
+    <h2>¿En qué área postulas?</h2>
+    <p>Selecciona un área o escoge "Mixto" para practicar todas las materias</p>
+
+    <div class="area-btn-grid">
+      <button class="area-btn" data-area="ingenierias">
+        <span class="area-btn-emoji">⚙️</span>
+        <span class="area-btn-name">Ingenierías</span>
+        <span class="area-btn-count">Mat · Física · Química</span>
+      </button>
+      <button class="area-btn" data-area="biomedicas">
+        <span class="area-btn-emoji">🧬</span>
+        <span class="area-btn-name">Biomédicas</span>
+        <span class="area-btn-count">Bio · Química · Física</span>
+      </button>
+      <button class="area-btn" data-area="sociales">
+        <span class="area-btn-emoji">📚</span>
+        <span class="area-btn-name">Sociales</span>
+        <span class="area-btn-count">Historia · Geo · Verbal</span>
+      </button>
+      <button class="area-btn" data-area="all">
+        <span class="area-btn-emoji">🌟</span>
+        <span class="area-btn-name">Mixto</span>
+        <span class="area-btn-count">Todas las materias</span>
+      </button>
+      <button class="area-btn" data-area="ingenierias" data-subject-filter="matematica">
+        <span class="area-btn-emoji">🔢</span>
+        <span class="area-btn-name">Solo Matemática</span>
+        <span class="area-btn-count">Álgebra · Aritmética</span>
+      </button>
+      <button class="area-btn" data-area="ingenierias" data-subject-filter="verbal">
+        <span class="area-btn-emoji">💬</span>
+        <span class="area-btn-name">Solo Verbal</span>
+        <span class="area-btn-count">Comprensión · Analogías</span>
+      </button>
+    </div>
+
+    <div style="display:flex; gap: 1rem; flex-wrap:wrap; justify-content:center; margin-bottom: 1rem;">
+      <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.85rem; color: var(--text-muted)">
+        <span style="font-weight:700">Duración:</span>
+        <select id="timeLimitSelect" style="background: var(--bg-card); border: 1.5px solid var(--border); border-radius: 0.5rem; padding: 6px 10px; font-size:0.85rem; color: var(--text-primary); cursor:pointer; font-family: var(--font-body);">
+          <option value="4800">80 minutos (examen real)</option>
+          <option value="1800">30 minutos (práctica rápida)</option>
+          <option value="600">10 minutos (repaso express)</option>
+          <option value="0">Sin límite de tiempo</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="btn btn-primary btn-lg" id="startQuizBtn" disabled style="margin-top:1rem">
+      🚀 Iniciar Simulacro
+    </button>
+    <p style="font-size:0.8rem; color:var(--text-muted); margin-top:0.75rem">
+      Puedes ver la solución de cada pregunta al responder.
+    </p>
+  </div>
+</div>
+
+<!-- ═══ QUIZ SCREEN ═══ -->
+<div id="quizScreen" class="hidden">
+  <div class="container">
+    <div class="quiz-layout">
+
+      <!-- Sidebar -->
+      <aside class="quiz-sidebar">
+        <div class="quiz-info-card">
+          <h3>⏱ Tiempo restante</h3>
+          <div class="timer-display" id="timerDisplay">80:00</div>
+          <div class="quiz-progress-bar">
+            <div class="quiz-progress-fill" id="progressFill" style="width:0%"></div>
+          </div>
+          <p style="font-size:0.75rem; color:var(--text-muted); margin-top:0.5rem; text-align:center" id="progressText">0 de 0 respondidas</p>
+        </div>
+
+        <div class="quiz-info-card">
+          <h3>📋 Preguntas</h3>
+          <div class="question-nav" id="questionNav"></div>
+        </div>
+
+        <button class="btn btn-outline" id="finishEarlyBtn" style="width:100%">
+          ✅ Terminar y ver resultados
+        </button>
+      </aside>
+
+      <!-- Main quiz -->
+      <main class="quiz-main">
+        <div class="quiz-card" id="questionCard">
+          <div class="quiz-meta">
+            <span class="quiz-subject-tag" id="questionSubject">Materia</span>
+            <span class="quiz-counter" id="questionCounter">Pregunta 1 / 10</span>
+          </div>
+
+          <p class="question-text" id="questionText">Cargando pregunta...</p>
+
+          <div class="options-list" id="optionsList"></div>
+
+          <div class="solution-panel" id="solutionPanel">
+            <h4>💡 Solución paso a paso</h4>
+            <div id="solutionContent"></div>
+          </div>
+        </div>
+
+        <div class="quiz-controls">
+          <button class="btn btn-ghost" id="prevBtn" disabled>← Anterior</button>
+          <div style="display:flex; gap:0.5rem">
+            <button class="btn btn-ghost" id="skipBtn">Saltar</button>
+            <button class="btn btn-primary" id="nextBtn">Siguiente →</button>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ RESULTS SCREEN ═══ -->
+<div id="resultsScreen" class="hidden">
+  <div class="container" style="max-width: 700px; padding: 2rem 1rem 4rem;">
+    <div class="results-card visible">
+      <div class="area-emoji" style="font-size:3rem" id="resultsEmoji">🎉</div>
+      <p class="results-label">Tu puntaje</p>
+      <div class="results-score" id="resultsScore">0/0</div>
+      <p class="results-message" id="resultsMessage">¡Bien hecho!</p>
+
+      <div class="results-breakdown">
+        <div class="breakdown-item breakdown-correct">
+          <span class="breakdown-num" id="correctCount">0</span>
+          <span class="breakdown-label">Correctas</span>
+        </div>
+        <div class="breakdown-item breakdown-wrong">
+          <span class="breakdown-num" id="wrongCount">0</span>
+          <span class="breakdown-label">Incorrectas</span>
+        </div>
+        <div class="breakdown-item breakdown-skip">
+          <span class="breakdown-num" id="skipCount">0</span>
+          <span class="breakdown-label">Saltadas</span>
+        </div>
+      </div>
+
+      <div id="subjectBreakdown" style="background: var(--bg-secondary); border-radius: var(--radius-lg); padding: 1rem; margin: 1rem 0; text-align: left;"></div>
+
+      <div style="display:flex; gap:1rem; flex-wrap:wrap; justify-content:center; margin-top:1rem">
+        <button class="btn btn-primary" onclick="location.reload()">🔄 Nuevo simulacro</button>
+        <a href="solucionario.html" class="btn btn-outline">📖 Ver solucionario</a>
+        <a href="registro.html" class="btn btn-ghost">⭐ Ir a Premium</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../js/app.js"></script>
+<script src="../js/progress.js"></script>
+<script src="../js/questions.js"></script>
+<script src="../js/simulacro.js"></script>
+</body>
+</html>
